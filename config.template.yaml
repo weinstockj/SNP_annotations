@@ -1,0 +1,49 @@
+# Configuration template for Genomic Variant Annotation Pipeline
+# Copy this file to config.yaml and update all paths to match your system
+
+# LD blocks file - Pre-defined linkage disequilibrium blocks
+# Download from: https://github.com/jmacdon/LDblocks_GRCh38/tree/master/data
+LD_blocks_file: "path/to/LD_blocks.bed"
+
+# Zoonomia conservation data
+# Download commands provided in README
+RoCC: "path/to/RoCCs.bed.gz"
+UCE: "path/to/zooUCEs.bed.gz"
+
+# Cell-type specific regulatory regions directories
+# From Zhang et al. 2021 single-cell atlas
+ADULT_CELL_TYPE_DIR: "path/to/adult_cell_type_bedfiles"
+FETAL_CELL_TYPE_DIR: "path/to/fetal_cell_type_bedfiles"
+
+# RegulomeDB annotations file
+# Download: wget https://www.encodeproject.org/files/ENCFF250UJY/@@download/ENCFF250UJY.tsv
+REGULOME_DB_PATH: "path/to/regulomedb.tsv"
+
+# dbSNP reference directory (contains parquet files)
+dbSNP_PATH: "path/to/dbSNP_directory"
+
+# AlphaMissense pathogenicity predictions
+# Download from: https://github.com/google-deepmind/alphamissense
+ALPHA_MISSENSE_PATH: "path/to/AlphaMissense_hg38.tsv.gz"
+
+# ENCODE candidate cis-regulatory elements
+# Download: wget https://downloads.wenglab.org/Registry-V4/GRCh38-cCREs.bed
+ENCODE_cCRE_PATH: "path/to/GRCh38-cCREs.bed"
+
+# 1000 Genomes allele frequency files prefix
+# Should point to directory containing chromosome-specific parquet files
+# Format: {AF_1KG_PREFIX}chr1.parquet, {AF_1KG_PREFIX}chr2.parquet, etc.
+AF_1KG_PREFIX: "path/to/1KG_AF/CCDG_1KG_"
+
+# Directory containing LD block variant lists
+# Should contain subdirectories named by LD block (e.g., chr1_21002467_22858108)
+# Each subdirectory should have a variant_list.tsv file
+LD_BLOCK_DIR: "path/to/LD_block_variants"
+
+# Output directory for results
+OUTPUT_DIR: "path/to/output"
+
+# Conda/Mamba activation scripts
+# Update these paths to match your conda/mamba installation
+CONDA: "path/to/conda.sh"
+MAMBA: "path/to/mamba.sh"
