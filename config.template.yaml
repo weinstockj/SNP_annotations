@@ -45,5 +45,5 @@ OUTPUT_DIR: "path/to/output"
 
 # Conda/Mamba activation scripts
 # Update these paths to match your conda/mamba installation
-CONDA: "path/to/conda.sh"
-MAMBA: "path/to/mamba.sh"
+# CONDA: "path/to/conda.sh"
+# MAMBA: "path/to/mamba.sh"

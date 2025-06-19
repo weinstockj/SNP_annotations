@@ -106,8 +106,38 @@ The pipeline requires the following input datasets configured in `config.yaml`:
    - **cCREs** (candidate Cis-Regulatory Elements): [https://screen.encodeproject.org/](https://screen.encodeproject.org/) - ENCODE SCREEN database
    - `bash wget https://downloads.wenglab.org/Registry-V4/GRCh38-cCREs.bed`
 
+## Quick Setup with Download Script
+
+🚀 **Get started quickly with our automated download script!**
+
+You can easily download zoonmia/catlas/ENCODE/regulome/AlphaMissense data using our automated script:
+
+```bash
+# Download and check the script (recommended to verify before execution)
+curl -sSL https://raw.githubusercontent.com/weinstockj/SNP_annotations/refs/heads/master/download_annotations_script.sh | wc -l
+
+# Execute the download script directly
+curl -sSL https://raw.githubusercontent.com/weinstockj/SNP_annotations/refs/heads/master/download_annotations_script.sh | bash
+
+# Or download first, review, then execute
+wget https://raw.githubusercontent.com/weinstockj/SNP_annotations/refs/heads/master/download_annotations_script.sh
+chmod +x download_annotations_script.sh
+./download_annotations_script.sh
+```
+
+This script will automatically download all the required annotation files mentioned in the Input Data Sources section below, saving you time and ensuring you have the correct versions.
+
+Note that you will still need to separately download the 1000 Genomes allele frequency data and the dbSNP database, as these are large datasets that require manual download from their respective sources.
+
+
+See [here](https://github.com/weinstockj/dbSNP_to_parquet) for a script to download the dbSNP VCF and then convert to Parquet format, which is required for the pipeline to help us merge in different sources.
+
+See [here](https://github.com/weinstockj/download_high_depth_1kg) 
+for a script to download the high depth 1000 Genomes allele frequency data, which is required for the pipeline.
+
 ## Configuration
 
+After downloading the required data, you need to configure the pipeline settings:
 Edit `config.yaml` to specify paths to your input data:
 
 ```yaml
