@@ -5,6 +5,29 @@ import sys
 import logging
 from utils import *
 
+def get_expected_column_order(variant_columns, bed_extra_columns, AF_columns, encode_names):
+    """
+    Generate the expected column order for the final dataframe.
+    
+    Args:
+        variant_columns: Base variant columns (chrom, start, end, variant_id, ref, alt)
+        bed_extra_columns: Additional columns from the bed file
+        AF_columns: Allele frequency columns from 1KG
+        encode_names: ENCODE cCRE column names
+    
+    Returns:
+        List of column names in the expected order
+    """
+    expected_columns = (
+        variant_columns +
+        bed_extra_columns +
+        AF_columns +
+        ["ChIP", "Chromatin_accessibility", "QTL", "PWM"] +  # regulomedb columns
+        ["am_pathogenicity"] +  # AlphaMissense column
+        sorted(encode_names)  # ENCODE columns in sorted order
+    )
+    return expected_columns
+
 bed_file           = sys.argv[1]
 AF_1KG_file        = sys.argv[2]
 regulomedb_file    = sys.argv[3]
@@ -44,6 +67,9 @@ if __name__ == "__main__":
 
     AF_1KG = pl.scan_parquet(AF_1KG_file). \
             with_columns(cs.contains("AF_").cast(pl.Float32))
+    
+    # Get AF column names for expected column ordering
+    AF_columns = [col for col in AF_1KG.collect_schema().names() if col.startswith("AF_")]
 
     logging.info("Loaded 1KG file")
 
@@ -88,6 +114,12 @@ if __name__ == "__main__":
             "PLS"
         ]
 
+    # Get bed extra columns (excluding variant columns)
+    bed_extra_columns = [col for col in headers if col not in variant_columns]
+    
+    # Generate expected column order
+    expected_columns = get_expected_column_order(variant_columns, bed_extra_columns, AF_columns, encode_names)
+
     current_names = dfm.columns 
     encode_diff = list(set(encode_names) - set(current_names))
 
@@ -106,7 +138,8 @@ if __name__ == "__main__":
             fill_null(False) # impute
         ). \
         unique(). \
-        sort("start")
+        sort("start"). \
+        select([col for col in expected_columns if col in dfm.collect_schema().names()])
 
     logging.info("Now writing")
     dfm.sink_parquet(output_file)
