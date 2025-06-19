@@ -26,8 +26,6 @@ ENCODE_cCRE_PATH = cfg["ENCODE_cCRE_PATH"]
 AF_1KG_PREFIX = cfg["AF_1KG_PREFIX"]
 LD_BLOCK_DIR = cfg["LD_BLOCK_DIR"]
 OUTPUT_DIR = cfg["OUTPUT_DIR"]
-CONDA = cfg["CONDA"]
-MAMBA = cfg["MAMBA"]
 
 ## -----------------------------------------------------------------------------------
 
@@ -81,7 +79,6 @@ rule ccre:
         mkdir -p {params.out_dir}
         module load bedtools
         module load htslib
-        bedtools --version
         tail -n+2 {params.variant_list} | awk '{{print $1, $2-1, $2, $3, $4, $5}}' OFS="\t" | bgzip -c > {params.variant_list_bed}
 
         bedtools annotate -i {params.variant_list_bed} -files {CELL_TYPE_PATHS} {RoCC} {UCE} -names {ALL_CELL_TYPES} RoCC UCE -counts > {output.annotated}
@@ -99,9 +96,7 @@ rule convert_regulome:
         time = "2:00:00"
     shell:
         """
-        source {CONDA}
-        source {MAMBA}
-        mamba activate parquet 
+        source .venv/bin/activate
 
         python -c 'import polars as pl; pl.scan_csv("{input}", has_header=True, separator = "\t").sink_parquet("{output}")'
         """
@@ -118,9 +113,7 @@ rule setid_regulome:
         time = "2:00:00"
     shell:
         """
-        source {CONDA}
-        source {MAMBA}
-        mamba activate parquet 
+        source .venv/bin/activate 
 
         python -c 'import polars as pl; df = pl.scan_parquet("{input}").rename({{"rsid" : "RSID"}}); lk = pl.scan_parquet("{dbSNP_PATH}/*.parquet"); df.join(lk, how = "inner", on = "RSID").sink_parquet("{output}")'
         """
@@ -137,9 +130,7 @@ rule convert_alpha:
         time = "2:00:00"
     shell:
         """
-        source {CONDA}
-        source {MAMBA}
-        mamba activate parquet 
+        source .venv/bin/activate 
 
         python -c 'import polars as pl; pl.read_csv("{input}", has_header=True, separator = "\t", skip_rows=3, columns = ["#CHROM", "POS", "REF", "ALT", "am_pathogenicity"]).with_columns(pl.concat_str([pl.col("#CHROM"), pl.col("POS"), pl.col("REF"), pl.col("ALT")], separator = "_").alias("variant_id")).write_parquet("{output}")'
         """
@@ -161,9 +152,7 @@ rule add_more_annotations:
         time = "1:00:00"
     shell:
         """
-        source {CONDA}
-        source {MAMBA}
-        mamba activate parquet 
+        source .venv/bin/activate 
 
         python add_annotations.py {input.bed} {params.AF} {input.regulome} {input.AlphaMissense} {input.ENCODE_cCRE} {output}
         """
