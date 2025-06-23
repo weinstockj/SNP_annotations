@@ -101,14 +101,42 @@ fi
 print_status $BLUE "Checking system dependencies..."
 
 # Check for common tools that might be needed
-SYSTEM_TOOLS=("git")
+SYSTEM_TOOLS=("git" "duckdb" "bgzip" "bedtools")
 for tool in "${SYSTEM_TOOLS[@]}"; do
     if command -v $tool &> /dev/null; then
-        print_status $GREEN "✓ $tool available"
+        VERSION=$(command -v $tool &> /dev/null && $tool --version 2>/dev/null | head -n1 || echo "")
+        if [[ -n "$VERSION" ]]; then
+            print_status $GREEN "✓ $tool available ($VERSION)"
+        else
+            print_status $GREEN "✓ $tool available"
+        fi
     else
-        print_status $YELLOW "⚠ $tool not found (may be needed)"
+        case $tool in
+            "duckdb")
+                print_status $RED "✗ $tool not found (required for data processing)"
+                print_status $YELLOW "  Install with: wget https://github.com/duckdb/duckdb/releases/latest/download/duckdb_cli-linux-amd64.zip"
+                ;;
+            "bgzip")
+                print_status $RED "✗ $tool not found (required for compression)"
+                print_status $YELLOW "  Install with: conda install -c bioconda htslib"
+                ;;
+            "bedtools")
+                print_status $RED "✗ $tool not found (required for genomic analysis)"
+                print_status $YELLOW "  Install with: conda install -c bioconda bedtools"
+                ;;
+            *)
+                print_status $YELLOW "⚠ $tool not found (may be needed)"
+                ;;
+        esac
+        MISSING_SYSTEM_TOOLS=true
     fi
 done
+
+# Exit if required system tools are missing
+if [[ "$MISSING_SYSTEM_TOOLS" == "true" ]]; then
+    print_status $RED "Required system tools are missing. Please install them before proceeding."
+    exit 1
+fi
 
 # Check if Snakemake can be executed
 print_status $BLUE "Testing Snakemake execution..."
