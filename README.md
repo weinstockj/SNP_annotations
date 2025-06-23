@@ -15,15 +15,15 @@ This pipeline processes genomic variants in LD (Linkage Disequilibrium) blocks a
 ## Requirements
 
 ### Software Dependencies
-- Snakemake
 - bedtools
-- htslib
+- bgzip
 - DuckDB
-- Python packages:
+- uv (for managing Python environments)
+- Python packages (this will be handled by uv):
+  - Snakemake
   - polars
   - pandas
   - yaml
-- Conda/Mamba environments (see Environment Setup below)
 
 ### Environment Setup
 
@@ -33,41 +33,13 @@ This pipeline requires two conda/mamba environments that can be automatically cr
 Create the main environment for running the Snakemake workflow:
 
 ```bash
-# Using conda
-conda create --name snakemake --file requirements_snakemake.txt
-
-# Using mamba (recommended for faster installation)
-mamba create --name snakemake --file requirements_snakemake.txt
-```
-
-#### 2. Parquet Environment 
-Create the environment for data processing steps:
-
-```bash
-# Using conda
-conda create --name parquet --file requirements_parquet.txt
-
-# Using mamba (recommended for faster installation)  
-mamba create --name parquet --file requirements_parquet.txt
+uv sync
 ```
 
 #### Activating Environments
 
-The Snakemake workflow will automatically activate the appropriate environments. However, you can manually activate them as needed:
-
 ```bash
-# Activate snakemake environment to run the workflow
-conda activate snakemake
-
-# The parquet environment is automatically activated by rules that process data
-# But you can manually activate it for testing:
-conda activate parquet
-```
-
-**Note**: Make sure to update the paths to your conda/mamba activation scripts in `config.yaml`:
-```yaml
-CONDA: "/path/to/your/conda.sh"
-MAMBA: "/path/to/your/mamba.sh"
+source .venv/bin/activate
 ```
 
 ### Input Data Sources
@@ -108,14 +80,11 @@ The pipeline requires the following input datasets configured in `config.yaml`:
 
 ## Quick Setup with Download Script
 
-🚀 **Get started quickly with our automated download script!**
+🚀 **Get started quickly with our automated download script**
 
 You can easily download zoonmia/catlas/ENCODE/regulome/AlphaMissense data using our automated script:
 
 ```bash
-# Download and check the script (recommended to verify before execution)
-curl -sSL https://raw.githubusercontent.com/weinstockj/SNP_annotations/refs/heads/master/download_annotations_script.sh | wc -l
-
 # Execute the download script directly
 curl -sSL https://raw.githubusercontent.com/weinstockj/SNP_annotations/refs/heads/master/download_annotations_script.sh | bash
 
@@ -155,10 +124,10 @@ REGULOME_DB_PATH: "path/to/regulomedb.tsv"
 
 ```bash
 # Run with cluster execution (SLURM)
-bash run_cluster.sh
+source .venv/bin/activate && run_cluster.sh
 
 # Or run locally
-snakemake -p -j <num_cores> --rerun-incomplete
+source .venv/bin/activate && snakemake -p -j <num_cores> 
 ```
 
 ### Key Output Files
