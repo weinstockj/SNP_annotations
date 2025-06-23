@@ -47,3 +47,40 @@ OUTPUT_DIR: "path/to/output"
 # Update these paths to match your conda/mamba installation
 # CONDA: "path/to/conda.sh"
 # MAMBA: "path/to/mamba.sh"
+
+# SLURM resource configurations for each rule
+slurm_resources:
+  ccre:
+    mem: "3G"
+    partition: "nodes*"
+    time: "8:00:00"
+  
+  convert_regulome:
+    mem: "6G"
+    partition: "nodes*"
+    time: "2:00:00"
+  
+  setid_regulome:
+    mem: "6G"
+    partition: "nodes*"
+    time: "2:00:00"
+  
+  convert_alpha:
+    mem: "15G"
+    partition: "nodes*"
+    time: "2:00:00"
+  
+  add_more_annotations:
+    mem: "18G"
+    partition: "nodes*"
+    time: "1:00:00"
+  
+  collate_annotations:
+    mem: "18G"
+    partition: "nodes*"
+    time: "2:00:00"
+  
+  mega_bed:
+    mem: "12G"
+    partition: "nodes*"
+    time: "6:00:00"

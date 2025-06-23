@@ -71,14 +71,14 @@ rule ccre:
         annotated = os.path.join(OUTPUT_DIR, "{BLOCK}", "variant_list_ccre_annotated.bed")
     threads: 1 
     resources:
-        mem = "3G",
-        partition = "shared",
-        time = "8:00:00"
+        mem = cfg["slurm_resources"]["ccre"]["mem"],
+        partition = cfg["slurm_resources"]["ccre"]["partition"],
+        time = cfg["slurm_resources"]["ccre"]["time"]
     shell:
         """
         mkdir -p {params.out_dir}
-        module load bedtools
-        module load htslib
+        # module load bedtools
+        # module load htslib
         tail -n+2 {params.variant_list} | awk '{{print $1, $2-1, $2, $3, $4, $5}}' OFS="\t" | bgzip -c > {params.variant_list_bed}
 
         bedtools annotate -i {params.variant_list_bed} -files {CELL_TYPE_PATHS} {RoCC} {UCE} -names {ALL_CELL_TYPES} RoCC UCE -counts > {output.annotated}
@@ -91,9 +91,9 @@ rule convert_regulome:
         os.path.join(os.path.dirname(REGULOME_DB_PATH), "regulomedb.parquet")
     threads: 1 
     resources:
-        mem = "6G",
-        partition = "shared",
-        time = "2:00:00"
+        mem = cfg["slurm_resources"]["convert_regulome"]["mem"],
+        partition = cfg["slurm_resources"]["convert_regulome"]["partition"],
+        time = cfg["slurm_resources"]["convert_regulome"]["time"]
     shell:
         """
         source .venv/bin/activate
@@ -108,9 +108,9 @@ rule setid_regulome:
         os.path.join(os.path.dirname(REGULOME_DB_PATH), "regulomedb_with_id.parquet")
     threads: 1 
     resources:
-        mem = "6G",
-        partition = "shared",
-        time = "2:00:00"
+        mem = cfg["slurm_resources"]["setid_regulome"]["mem"],
+        partition = cfg["slurm_resources"]["setid_regulome"]["partition"],
+        time = cfg["slurm_resources"]["setid_regulome"]["time"]
     shell:
         """
         source .venv/bin/activate 
@@ -125,9 +125,9 @@ rule convert_alpha:
         os.path.join(os.path.dirname(ALPHA_MISSENSE_PATH), "AlphaMissense_hg38.parquet")
     threads: 1 
     resources:
-        mem = "15G",
-        partition = "shared",
-        time = "2:00:00"
+        mem = cfg["slurm_resources"]["convert_alpha"]["mem"],
+        partition = cfg["slurm_resources"]["convert_alpha"]["partition"],
+        time = cfg["slurm_resources"]["convert_alpha"]["time"]
     shell:
         """
         source .venv/bin/activate 
@@ -147,9 +147,9 @@ rule add_more_annotations:
         AF = lambda w: AF_1KG_PREFIX + LD_blocks.chr[LD_blocks.block == w.BLOCK].values[0] + ".parquet"
     threads: 2
     resources:
-        mem = "18000",
-        partition = "shared",
-        time = "1:00:00"
+        mem = cfg["slurm_resources"]["add_more_annotations"]["mem"],
+        partition = cfg["slurm_resources"]["add_more_annotations"]["partition"],
+        time = cfg["slurm_resources"]["add_more_annotations"]["time"]
     shell:
         """
         source .venv/bin/activate 
@@ -166,9 +166,9 @@ rule collate_annotations:
         input_string = lambda w: ", ".join([f"'{x}'" for x in rules.collate_annotations.input]) 
     threads: 1
     resources:
-        mem = "18000",
-        partition = "shared",
-        time = "2:00:00"
+        mem = cfg["slurm_resources"]["collate_annotations"]["mem"],
+        partition = cfg["slurm_resources"]["collate_annotations"]["partition"],
+        time = cfg["slurm_resources"]["collate_annotations"]["time"]
     shell:
         """
         duckdb -c "COPY (SELECT * FROM read_parquet([{params.input_string}], union_by_name=true)) TO '{output}' (FORMAT PARQUET, ROW_GROUP_SIZE 100_000);"
@@ -181,12 +181,12 @@ rule mega_bed:
         os.path.join(OUTPUT_DIR, "all_variants.bed")
     threads: 1
     resources:
-        mem = "12000",
-        partition = "shared",
-        time = "6:00:00"
+        mem = cfg["slurm_resources"]["mega_bed"]["mem"],
+        partition = cfg["slurm_resources"]["mega_bed"]["partition"],
+        time = cfg["slurm_resources"]["mega_bed"]["time"]
     shell:
         """
-        module load bedtools
-        module load htslib
+        # module load bedtools
+        # module load htslib
         cat {input} | sort -k1,1 -k2,2n | bgzip -c > {output}
         """
